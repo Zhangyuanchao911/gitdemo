@@ -20,7 +20,7 @@ Git是目前世界上最先进的分布式版本控制系统（没有之一）�
 
 命令：`git commit -m "message"`
 
-![image-20201011141433983](C:\Users\91145\AppData\Roaming\Typora\typora-user-images\image-20201011141433983.png)
+
 
 ​        简单解释一下`git commit`命令，`-m`后面输入的是本次提交的说明，可以输入任意内容，当然最好是有意义的，这样你就能从历史记录里方便地找到改动记录。 
 
