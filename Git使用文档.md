@@ -48,7 +48,7 @@ Git是目前世界上最先进的分布式版本控制系统（没有之一）�
 
 GitHub上创建仓库  创建完成之后复制该仓库的ssh地址
 
-<img src="C:\Users\91145\AppData\Roaming\Typora\typora-user-images\image-20201011140059129.png" alt="image-20201011140059129" style="zoom: 80%;" />
+<img src="https://github.com/Zhangyuanchao911/gitdemo/blob/master/img/20200208211439106.png" alt="image-20201011140059129" style="zoom: 80%;" />
 
 ##### 2.在本地使用命令
 
