@@ -1,6 +1,6 @@
 ## SQL
 
-### Sql基础语法
+### 一  Sql基础语法
 
 #### SQL DML 和 DDL
 
@@ -92,7 +92,7 @@ WHERE LastName = 'Wilson'
 
 ##### 语法：DELETE FROM 表名称 WHERE 列名称 = 值
 
-### SQL 高级
+### 二  SQL 高级
 
 #### top
 
@@ -352,7 +352,7 @@ FROM table_name
 WHERE condition
 ```
 
-### MySQL 数据类型
+### 三  MySQL 数据类型
 
 在 MySQL 中，有三种主要的类型：文本、数字和日期/时间类型。
 
@@ -399,7 +399,7 @@ WHERE condition
 
 \* 即便 DATETIME 和 TIMESTAMP 返回相同的格式，它们的工作方式很不同。在 INSERT 或 UPDATE 查询中，TIMESTAMP 自动把自身设置为当前的日期和时间。TIMESTAMP 也接受不同的格式，比如 YYYYMMDDHHMMSS、YYMMDDHHMMSS、YYYYMMDD 或 YYMMDD。
 
-### SQL 函数
+### 四   SQL 函数
 
 #### group by
 
@@ -443,3 +443,51 @@ SELECT COUNT(DISTINCT column_name) FROM table_name
 ```
 
 **注释：**COUNT(DISTINCT) 适用于 ORACLE 和 Microsoft SQL Server，但是无法用于 Microsoft Access。
+
+## SQL面试题
+
+### 数据库三大范式
+
+### 第一范式
+
+每个列都不可以再拆分。
+
+第二范式：在第一范式的基础上，非主键列完全依赖于主键，而不能是依赖于主键的一部分。
+
+第三范式：在第二范式的基础上，非主键列只依赖于主键，不依赖于其他非主键。
+
+在设计数据库结构的时候，要尽量遵守三范式，如果不遵守，必须有足够的理由。比如性能。事实上我们经常会为了性能而妥协数据库的设计。
+
+### 引擎
+
+#### MySQL存储引擎MyISAM与InnoDB区别
+
+存储引擎Storage engine：MySQL中的数据、索引以及其他对象是如何存储的，是一套文件系统的实现。
+
+常用的存储引擎有以下：
+
+- **Innodb引擎**：Innodb引擎提供了对数据库ACID事务的支持。并且还提供了行级锁和外键的约束。它的设计的目标就是处理大数据容量的数据库系统。
+- **MyIASM引擎**(原本Mysql的默认引擎)：不提供事务的支持，也不支持行级锁和外键。
+- **MEMORY引擎**：所有的数据都在内存中，数据的处理速度快，但是安全性不高。
+
+#### MyISAM索引与InnoDB索引的区别
+
+- InnoDB索引是聚簇索引，MyISAM索引是非聚簇索引。
+- InnoDB的主键索引的叶子节点存储着行数据，因此主键索引非常高效。
+- MyISAM索引的叶子节点存储的是行数据地址，需要再寻址一次才能得到数据。
+- InnoDB非主键索引的叶子节点存储的是主键和其他带索引的列数据，因此查询时做到覆盖索引会非常高效。
+
+#### InnoDB引擎的4大特性
+
+- 插入缓冲（insert buffer)
+- 二次写(double write)
+- 自适应哈希索引(ahi)
+- 预读(read ahead)      
+
+#### 存储引擎选择
+
+如果没有特别的需求，使用默认的`Innodb`即可。
+
+MyISAM：**以读写插入为主**的应用程序，比如博客系统、新闻门户网站。
+
+Innodb：**更新（删除）操作频率也高，或者要保证数据的完整性；并发量高，支持事务和外键**。比如OA自动化办公系统。
