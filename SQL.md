@@ -4,7 +4,7 @@
 
 
 
-## SQL
+## 数据库
 
 ### 一  Sql基础语法
 
@@ -498,7 +498,7 @@ SELECT COUNT(DISTINCT column_name) FROM table_name
 
 **注释：**COUNT(DISTINCT) 适用于 ORACLE 和 Microsoft SQL Server，但是无法用于 Microsoft Access。
 
-## SQL面试题
+## MySql数据库
 
 ### 数据库三大范式
 
@@ -764,6 +764,14 @@ SERIALIZABLE 是限制性最强的隔离级别，因为该级别**锁定整个�
 
 **行级锁** 行级锁是Mysql中锁定粒度最细的一种锁，表示只针对当前操作的行进行加锁。行级锁能大大减少数据库操作的冲突。其加锁粒度最小，但加锁的开销也最大。行级锁分为共享锁 和 排他锁。
 
+​     **(1)共享锁（S锁）**：共享 (S) 用于不更改或不更新数据的操作（只读操作），如 SELECT 语句。
+
+如果事务T对数据A加上共享锁后，则其他事务只能对A再加共享锁，不能加排他锁。获准共享锁的事务只能读数据，不能修改数据。
+
+​     **(2)排他锁（X锁）**：用于数据修改操作，例如 INSERT、UPDATE 或 DELETE。确保不会同时同一资源进行多重更新。
+
+如果事务T对数据A加上排他锁后，则其他事务不能再对A加任任何类型的封锁。获准排他锁的事务既能读数据，又能修改数据。
+
 特点：开销大，加锁慢；会出现死锁；锁定粒度最小，发生锁冲突的概率最低，并发度也最高。
 
 **表级锁** 表级锁是MySQL中锁定粒度最大的一种锁，表示对当前操作的整张表加锁，它实现简单，资源消耗较少，被大部分MySQL引擎支持。最常使用的MYISAM与INNODB都支持表级锁定。表级锁定分为表共享读锁（共享锁）与表独占写锁（排他锁）。
@@ -840,3 +848,139 @@ for update 可以根据条件来完成行锁锁定，并且 id 是有索引键�
 
 1. 条件：一条SQL语句的查询结果做为另一条查询语句的条件或查询结果
 2. 嵌套：多条SQL语句嵌套使用，内部的SQL查询语句称为子查询
+
+### sql面试题
+
+已知有如下4张表：
+
+学生表：student(学号,学生姓名,出生年月,性别)
+
+成绩表：score(学号,课程号,成绩)
+
+课程表：course(课程号,课程名称,教师号)
+
+教师表：teacher(教师号,教师姓名)
+
+1.查询课程为java的总成绩
+
+SELECT SUM(s.score) 总成绩 FROM score s 
+WHERE s.c_id =(SELECT c.id FROM course c WHERE c.c_name = 'java')
+
+2.查询选了课的人数
+
+SELECT COUNT(DISTINCT s_id)选课人数 FROM score 
+
+3.查询选了java课程的人数
+
+select  count(s_id) 选java的人数 from score  where c_id=(select id FROM course where c_name ='java')
+
+##### 分组
+
+**1.查询各科成绩最高分 最低分**
+
+SELECT c1.c_name 课程,MAX(s1.score) 最高分,MIN(s1.score)最低成绩  FROM score s1,course c1 WHERE s1.c_id=c1.id GROUP BY s1.c_id
+
+**2.查询每门课程被选修的学生数**
+
+SELECT c1.c_name 课程,COUNT(s1.s_id)选课人数 FROM score s1,course c1 WHERE s1.c_id=c1.id GROUP BY s1.c_id
+
+**3.查询平均成绩大于60的学生姓名和平均成绩**
+
+SELECT
+	st.NAME 姓名,
+	AVG( s1.score )平均成绩 
+FROM
+	score s1,
+	student st 
+WHERE
+s1.s_id = st.id 
+GROUP BY
+	s1.s_id
+	HAVING AVG(s1.score)>60
+
+**4.查询至少选修两门课程的学生学号**
+
+SELECT
+	st.NAME 姓名
+FROM
+	score s1,
+	student st 
+WHERE
+s1.s_id = st.id 
+GROUP BY
+	s1.s_id
+HAVING COUNT(s1.c_id)>=2
+
+**5.查询不及格的课程并按课程号从大到小排列**
+
+SELECT c1.c_name 不及格的课程名	
+FROM score s1,course c1
+WHERE s1.c_id=c1.id and s1.score<60
+GROUP BY s1.c_id DESC
+
+**6.查询每门课程的平均成绩，结果按平均成绩升序排序，平均成绩相同时，按课程号降序排列**
+
+SELECT AVG(s1.score)平均成绩,s1.c_id 课程号
+FROM score s1
+GROUP BY s1.c_id
+ORDER BY AVG(s1.score),c_id DESC
+
+**7.查询两门以上不及格课程的同学的学号及其平均成绩**
+
+SELECT AVG(s1.score) 平均成绩,s1.s_id 学号
+FROM score s1
+WHERE  s1.score<60
+GROUP BY s1.s_id
+HAVING COUNT(s1.c_id)>=2
+
+##### 复杂查询
+
+1.查询所有课程成绩小于60分学生的学号、姓名
+
+子查询
+
+SELECT  st.id 学号,st.`name` 姓名
+FROM student st
+WHERE st.id in(
+SELECT s1.s_id
+FROM score s1 
+WHERE s1.score<60
+)
+
+2.查询没有学全所有课的学生的学号、姓名
+
+SELECT  st.id 学号,st.`name` 姓名
+FROM student st
+WHERE st.id in(
+SELECT s.s_id
+FROM score s 
+GROUP BY s.s_id
+HAVING COUNT(s.c_id)<(SELECT COUNT(id) FROM course)
+)
+
+3.查询出只选修了两门课程的全部学生的学号和姓名
+
+SELECT  st.id 学号,st.`name` 姓名
+FROM student st
+WHERE st.id=(
+SELECT s.s_id
+FROM score s 
+GROUP BY s.s_id
+HAVING COUNT(s.c_id)=2
+)
+
+#### 多表查询
+
+1.查询所有学生的学号、姓名、选课数、总成绩
+
+SELECT
+	st.`name`姓名,
+	st.id 学号,
+	COUNT( s.c_id )选课数,
+	SUM( s.score )总成绩 
+FROM
+	student st
+	JOIN score s ON st.id = s.s_id 
+GROUP BY
+	s.s_id
+
